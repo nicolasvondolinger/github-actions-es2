@@ -83,7 +83,7 @@ jobs:
         include:
           - name: VS 2019
             # CORREÇÃO: Usando "Enterprise" em vez de "Community"
-            vcvars_path: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"'
+            vcvars_path: '"C:\Program Files (x86)\Microsoft Visual Studio\2021\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"'
           - name: VS 2022
             # CORREÇÃO: Usando "Enterprise" em vez de "Community"
             vcvars_path: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"'
