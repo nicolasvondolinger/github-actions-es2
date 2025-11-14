@@ -1,0 +1,103 @@
+# Nome do Workflow
+name: C++ CI Tests
+
+# Gatilhos
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  #------------------------------------
+  # JOB 1: LINUX (Sem alterações)
+  #------------------------------------
+  build-linux:
+    name: Build & Test on Linux (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: g++-9
+            cxx: g++-9
+            cc: gcc-9
+          - name: g++-11
+            cxx: g++-11
+            cc: gcc-11
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.cxx }}
+      - name: Compile
+        run: ${{ matrix.cxx }} -std=c++17 main.cpp graph.cpp -o run-tests
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+      - name: Run tests
+        run: ./run-tests
+
+  #------------------------------------
+  # JOB 2: MACOS (Sem alterações)
+  #------------------------------------
+  build-macos:
+    name: Build & Test on macOS (${{ matrix.name }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: clang (default)
+            cxx: clang++
+            cc: clang
+          - name: g++-11 (brew)
+            cxx: g++-11
+            cc: gcc-11
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up dependencies (g++-11)
+        if: matrix.cxx == 'g++-11'
+        run: |
+          brew install gcc@11
+      - name: Compile
+        run: ${{ matrix.cxx }} -std=c++17 main.cpp graph.cpp -o run-tests
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+      - name: Run tests
+        run: ./run-tests
+
+  #------------------------------------
+  # JOB 3: WINDOWS (COM A CORREÇÃO DE SINTAXE)
+  #------------------------------------
+  build-windows:
+    name: Build & Test on Windows (${{ matrix.name }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: VS 2019
+            # CORREÇÃO: Usando a sintaxe de expansão do Actions
+            vcvars_call: 'call "${{ env.VS2019_ROOT }}\VC\Auxiliary\Build\vcvarsall.bat" x64'
+          - name: VS 2022
+            # CORREÇÃO: Usando a sintaxe de expansão do Actions
+            vcvars_call: 'call "${{ env.VS2022_ROOT }}\VC\Auxiliary\Build\vcvarsall.bat" x64'
+            
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup environment and Compile
+        run: |
+          ${{ matrix.vcvars_call }}          
+          cl.exe /EHsc /std:c++17 main.cpp graph.cpp /Fe:run-tests.exe
+        shell: cmd 
+
+      - name: Run tests
+        run: .\run-tests.exe
+        shell: cmd
