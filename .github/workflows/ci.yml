@@ -72,7 +72,7 @@ jobs:
         run: ./run-tests
 
   #------------------------------------
-  # JOB 3: WINDOWS (COM A CORREÇÃO DE SINTAXE)
+  # JOB 3: WINDOWS (COM O CAMINHO CORRETO)
   #------------------------------------
   build-windows:
     name: Build & Test on Windows (${{ matrix.name }})
@@ -82,11 +82,11 @@ jobs:
       matrix:
         include:
           - name: VS 2019
-            # CORREÇÃO: Usando a sintaxe de expansão do Actions
-            vcvars_call: 'call "${{ env.VS2019_ROOT }}\VC\Auxiliary\Build\vcvarsall.bat" x64'
+            # CORREÇÃO: Usando "Enterprise" em vez de "Community"
+            vcvars_path: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"'
           - name: VS 2022
-            # CORREÇÃO: Usando a sintaxe de expansão do Actions
-            vcvars_call: 'call "${{ env.VS2022_ROOT }}\VC\Auxiliary\Build\vcvarsall.bat" x64'
+            # CORREÇÃO: Usando "Enterprise" em vez de "Community"
+            vcvars_path: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"'
             
     steps:
       - name: Check out code
@@ -94,7 +94,10 @@ jobs:
 
       - name: Setup environment and Compile
         run: |
-          ${{ matrix.vcvars_call }}          
+          # 1. Chama o script de setup do compilador com o caminho correto
+          call ${{ matrix.vcvars_path }} x64
+          
+          # 2. Compila (agora o cl.exe deve ser encontrado)
           cl.exe /EHsc /std:c++17 main.cpp graph.cpp /Fe:run-tests.exe
         shell: cmd 
 
