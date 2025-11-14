@@ -71,18 +71,20 @@ jobs:
       matrix:
         include:
           - name: VS 2019
-            vcvars_path: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvarsall.bat"'
+            vs_version: '2019'
           - name: VS 2022
-            vcvars_path: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"'
-            
+            vs_version: '2022'
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup environment and Compile
-        run: |
-          call ${{ matrix.vcvars_path }} x64
-          cl.exe /EHsc /std=c++17 main.cpp graph.cpp /Fe:run-tests.exe
+      - name: Set up MSVC
+        uses: microsoft/setup-msvc@v2
+        with:
+          vs-version: ${{ matrix.vs_version }}
+
+      - name: Compile
+        run: cl.exe /EHsc /std:c++17 main.cpp graph.cpp /Fe:run-tests.exe
         shell: cmd 
 
       - name: Run tests
