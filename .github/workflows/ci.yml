@@ -1,7 +1,5 @@
-# Nome do Workflow
 name: C++ CI Tests
 
-# Gatilhos
 on:
   push:
     branches: [ main, master ]
@@ -9,9 +7,6 @@ on:
     branches: [ main, master ]
 
 jobs:
-  #------------------------------------
-  # JOB 1: LINUX (Sem alterações)
-  #------------------------------------
   build-linux:
     name: Build & Test on Linux (${{ matrix.name }})
     runs-on: ubuntu-latest
@@ -40,9 +35,6 @@ jobs:
       - name: Run tests
         run: ./run-tests
 
-  #------------------------------------
-  # JOB 2: MACOS (Sem alterações)
-  #------------------------------------
   build-macos:
     name: Build & Test on macOS (${{ matrix.name }})
     runs-on: macos-latest
@@ -71,9 +63,6 @@ jobs:
       - name: Run tests
         run: ./run-tests
 
-  #------------------------------------
-  # JOB 3: WINDOWS (COM O CAMINHO CORRETO)
-  #------------------------------------
   build-windows:
     name: Build & Test on Windows (${{ matrix.name }})
     runs-on: windows-latest
@@ -81,11 +70,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: VS 2023
-            # CORREÇÃO: Usando "Enterprise" em vez de "Community"
-            vcvars_path: '"C:\Program Files\Microsoft Visual Studio\2023\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"'
+          - name: VS 2019
+            vcvars_path: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"'
           - name: VS 2022
-            # CORREÇÃO: Usando "Enterprise" em vez de "Community"
             vcvars_path: '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"'
             
     steps:
@@ -95,7 +82,7 @@ jobs:
       - name: Setup environment and Compile
         run: |
           call ${{ matrix.vcvars_path }} x64
-          cl.exe /EHsc /std:c++17 main.cpp graph.cpp /Fe:run-tests.exe
+          cl.exe /EHsc /std=c++17 main.cpp graph.cpp /Fe:run-tests.exe
         shell: cmd 
 
       - name: Run tests
