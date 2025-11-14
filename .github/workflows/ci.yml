@@ -94,10 +94,7 @@ jobs:
 
       - name: Setup environment and Compile
         run: |
-          # 1. Chama o script de setup do compilador com o caminho correto
           call ${{ matrix.vcvars_path }} x64
-          
-          # 2. Compila (agora o cl.exe deve ser encontrado)
           cl.exe /EHsc /std:c++17 main.cpp graph.cpp /Fe:run-tests.exe
         shell: cmd 
 
