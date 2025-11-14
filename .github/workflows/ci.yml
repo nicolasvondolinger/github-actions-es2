@@ -71,20 +71,18 @@ jobs:
       matrix:
         include:
           - name: VS 2019
-            vs_version: '2019'
+            vcvars_call: 'call "${{ env.VS2019_ROOT }}\VC\Auxiliary\Build\vcvarsall.bat" x64'
           - name: VS 2022
-            vs_version: '2022'
+            vcvars_call: 'call "${{ env.VS2022_ROOT }}\VC\Auxiliary\Build\vcvarsall.bat" x64'
+            
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Set up MSVC
-        uses: microsoft/setup-msvc@v2
-        with:
-          vs-version: ${{ matrix.vs_version }}
-
-      - name: Compile
-        run: cl.exe /EHsc /std:c++17 main.cpp graph.cpp /Fe:run-tests.exe
+      - name: Setup environment and Compile
+        run: |
+          ${{ matrix.vcvars_call }}
+          cl.exe /EHsc /std=c++17 main.cpp graph.cpp /Fe:run-tests.exe
         shell: cmd 
 
       - name: Run tests
